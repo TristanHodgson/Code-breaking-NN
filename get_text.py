@@ -4,6 +4,8 @@ import re
 
 from random import shuffle
 
+from ceaser import char_to_num
+
 from typing import List, Generator, Tuple, Optional
 from tqdm.autonotebook import tqdm
 
@@ -60,7 +62,7 @@ def initialise(encryptionAlgorithm,
                test_train_split_num: float = 0.8,
                stream: Optional[bool] = True) -> Tuple[List, List]:
     """
-    Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, shuffles the resulting data, and then splits it into a training set and a testing set
+    Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, converts each character to a number, splits into random test and train datasets
 
     Args:
         encryptionAlgorithm (function): A function that takes a plaintext string and returns a tuple containing the corresponding ciphertext (str) and the random encryption key (int)
@@ -70,8 +72,8 @@ def initialise(encryptionAlgorithm,
 
     Returns:
         tuple:
-            - The training dataset: A list of [ciphertext, key] pairs
-            - The testing dataset: A list of [ciphertext, key] pairs
+            - The training dataset: A list of [numeric ciphertext, key] pairs
+            - The testing dataset: A list of [numeric ciphertext, key] pairs
     """
     textChucks = fetch_chunks(num_blocks, words_per_block, stream)
 
@@ -80,7 +82,27 @@ def initialise(encryptionAlgorithm,
         chunk, key = encryptionAlgorithm(chunk)
         data.append([chunk, key])
 
+    for i, (string, key) in enumerate(data):
+        data[i] = [string2_num_list(string), key]
     return test_train_split(data, test_train_split_num)
+
+
+def string2_num_list(string: str) -> list[int]:
+    """
+    Turns a string of spaces and letters into a list of numbers
+
+    Args:
+        char (str): The string to convert
+
+    Returns:
+        int: The numerical representation of the string. Returns 1-26 for 1-z, and 0 for a space
+    """
+    assert isinstance(string, str)
+    nums = []
+    for char in string:
+        if char == " " or char.isalpha():
+            nums.append(char_to_num(char)+1)
+    return nums
 
 
 def test_train_split(data: List, split: float) -> Tuple[List, List]:
