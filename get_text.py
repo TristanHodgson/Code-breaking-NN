@@ -93,9 +93,7 @@ def test_train_split(data: List, split: float) -> Tuple(List, List):
                        set. Must be a value between 0.0 and 1.0
 
     Returns:
-        Tuple[List[T], List[T]]: A tuple containing two lists:
-                                 - The first list is the training data.
-                                 - The second list is the testing data.
+        Tuple[List, List]: A tuple containing two lists corresponding to training and testing data
     """
     assert isinstance(data, list)
     assert isinstance(split, (float, int))
