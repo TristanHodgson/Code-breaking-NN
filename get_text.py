@@ -4,11 +4,11 @@ import re
 
 from random import shuffle
 
-from typing import List, Generator, Tuple
+from typing import List, Generator, Tuple, Optional
 from tqdm.autonotebook import tqdm
 
 
-def word_gen() -> Generator[str, None, None]:
+def word_gen(stream: bool) -> Generator[str, None, None]:
     """
     A generator that yields words one by one from the manu/project_gutenberg dataset from Hugging Face
 
@@ -16,8 +16,7 @@ def word_gen() -> Generator[str, None, None]:
         str: A word from the dataset
     """
     try:
-        dataset = load_dataset("manu/project_gutenberg", split="en")
-        # dataset = load_dataset("manu/project_gutenberg", split="en", streaming=True)
+        dataset = load_dataset("manu/project_gutenberg", split="en", streaming=stream)
     except Exception as e:
         print(f"Error loading dataset: {e}")
         return
@@ -31,7 +30,7 @@ def word_gen() -> Generator[str, None, None]:
                 yield word
 
 
-def fetch_chunks(num_blocks: int, words_per_block: int) -> List[str]:
+def fetch_chunks(num_blocks: int, words_per_block: int, stream: bool) -> List[str]:
     """
     Fetches chunks of text from the Project Gutenberg dataset
     Will chunk the whole dataset if num_blocks*words_per_block>len(dataset)
@@ -43,7 +42,7 @@ def fetch_chunks(num_blocks: int, words_per_block: int) -> List[str]:
     Returns:
         List[str]: The final list of text chunks
     """
-    word_stream = word_gen()
+    word_stream = word_gen(stream)
     data = []
     for _ in range(num_blocks):
         block_words = list(islice(word_stream, words_per_block))
@@ -58,7 +57,8 @@ def fetch_chunks(num_blocks: int, words_per_block: int) -> List[str]:
 def initialise(encryptionAlgorithm,
                num_blocks: int,
                words_per_block: int,
-               test_train_split_num: float = 0.8) -> Tuple[List, List]:
+               test_train_split_num: float = 0.8,
+               stream: Optional[bool] = True) -> Tuple[List, List]:
     """
     Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, shuffles the resulting data, and then splits it into a training set and a testing set
 
@@ -73,7 +73,7 @@ def initialise(encryptionAlgorithm,
             - The training dataset: A list of [ciphertext, key] pairs
             - The testing dataset: A list of [ciphertext, key] pairs
     """
-    textChucks = fetch_chunks(num_blocks, words_per_block)
+    textChucks = fetch_chunks(num_blocks, words_per_block, stream)
 
     data = []
     for chunk in tqdm(textChucks):
@@ -83,7 +83,7 @@ def initialise(encryptionAlgorithm,
     return test_train_split(data, test_train_split_num)
 
 
-def test_train_split(data: List, split: float) -> Tuple(List, List):
+def test_train_split(data: List, split: float) -> Tuple[List, List]:
     """
     Splits a list of data into random training and testing sets
 
@@ -102,15 +102,3 @@ def test_train_split(data: List, split: float) -> Tuple(List, List):
     shuffle(data)
     trainData, testData = data[:n], data[n:]
     return trainData, testData
-
-
-if __name__ == "__main__":
-    number_of_blocks = 5
-    words_per_block = 200
-
-    blocks = fetch_chunks(number_of_blocks, words_per_block)
-    if blocks:
-        for i, block in enumerate(blocks):
-            print(f'{"#"*51}\n{"#"*18} Block {i:03d} {"#"*18}\n{"#"*51}{block}\n')
-    else:
-        print("Could not generate text blocks.")
