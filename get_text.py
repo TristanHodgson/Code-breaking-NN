@@ -58,7 +58,7 @@ def fetch_chunks(num_blocks: int, words_per_block: int) -> List[str]:
 def initialise(encryptionAlgorithm,
                num_blocks: int,
                words_per_block: int,
-               test_train_split: float = 0.8) -> Tuple[List, List]:
+               test_train_split_num: float = 0.8) -> Tuple[List, List]:
     """
     Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, shuffles the resulting data, and then splits it into a training set and a testing set
 
@@ -66,7 +66,7 @@ def initialise(encryptionAlgorithm,
         encryptionAlgorithm (function): A function that takes a plaintext string and returns a tuple containing the corresponding ciphertext (str) and the random encryption key (int)
         num_blocks (int): The total number of chunks of text to fetch
         words_per_block (int): The number of words in each chunk.
-        test_train_split (float, optional): The proportion of the data to allocate to the training set. Defaults to 0.8
+        test_train_split_num (float, optional): The proportion of the data to allocate to the training set. Defaults to 0.8
 
     Returns:
         tuple:
@@ -74,14 +74,34 @@ def initialise(encryptionAlgorithm,
             - The testing dataset: A list of [ciphertext, key] pairs
     """
     textChucks = fetch_chunks(num_blocks, words_per_block)
-    shuffle(textChucks)
 
     data = []
     for chunk in tqdm(textChucks):
         chunk, key = encryptionAlgorithm(chunk)
         data.append([chunk, key])
 
-    n = int(len(textChucks)*test_train_split)
+    return test_train_split(data, test_train_split_num)
+
+
+def test_train_split(data: List, split: float) -> Tuple(List, List):
+    """
+    Splits a list of data into random training and testing sets
+
+    Args:
+        data (List): The list of data to be split
+        split (float): The proportion of the data to allocate to the training
+                       set. Must be a value between 0.0 and 1.0
+
+    Returns:
+        Tuple[List[T], List[T]]: A tuple containing two lists:
+                                 - The first list is the training data.
+                                 - The second list is the testing data.
+    """
+    assert isinstance(data, list)
+    assert isinstance(split, (float, int))
+    assert split >= 0 and split <= 1
+    n = int(len(data)*split)
+    shuffle(data)
     trainData, testData = data[:n], data[n:]
     return trainData, testData
 
