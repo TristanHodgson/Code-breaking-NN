@@ -16,8 +16,7 @@ def char_to_num(char: str) -> int:
         AssertionError: If the input string `char` is not a single character,
                         or if it is not an alphabet character or a space
     """
-    assert len(
-        char) == 1, "Error, length of string passed to char_to_num() should be 1"
+    assert len(char) == 1, "Error, length of string passed to char_to_num() should be 1"
     if char.isalpha():
         return ord(char) - ord("a")
     elif char == " ":
