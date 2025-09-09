@@ -4,7 +4,7 @@ import re
 
 from random import shuffle
 
-from ceaser import char_to_num
+from caesar import char_to_num
 
 from typing import List, Generator, Tuple, Optional
 from tqdm.autonotebook import tqdm
