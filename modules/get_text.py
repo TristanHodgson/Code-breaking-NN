@@ -56,37 +56,6 @@ def fetch_chunks(num_blocks: int, words_per_block: int, stream: bool) -> List[st
     return data
 
 
-def initialise(encryptionAlgorithm,
-               num_blocks: int,
-               words_per_block: int,
-               test_train_split_num: float = 0.8,
-               stream: Optional[bool] = True) -> Tuple[List, List]:
-    """
-    Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, converts each character to a number, splits into random test and train datasets
-
-    Args:
-        encryptionAlgorithm (function): A function that takes a plaintext string and returns a tuple containing the corresponding ciphertext (str) and the random encryption key (int)
-        num_blocks (int): The total number of chunks of text to fetch
-        words_per_block (int): The number of words in each chunk.
-        test_train_split_num (float, optional): The proportion of the data to allocate to the training set. Defaults to 0.8
-
-    Returns:
-        tuple:
-            - The training dataset: A list of [numeric ciphertext, key] pairs
-            - The testing dataset: A list of [numeric ciphertext, key] pairs
-    """
-    textChucks = fetch_chunks(num_blocks, words_per_block, stream)
-
-    data = []
-    for chunk in tqdm(textChucks):
-        chunk, key = encryptionAlgorithm(chunk)
-        data.append([chunk, key])
-
-    for i, (string, key) in enumerate(data):
-        data[i] = [string2_num_list(string), key]
-    return test_train_split(data, test_train_split_num)
-
-
 def string2_num_list(string: str) -> list[int]:
     """
     Turns a string of spaces and letters into a list of numbers
@@ -124,3 +93,29 @@ def test_train_split(data: List, split: float) -> Tuple[List, List]:
     shuffle(data)
     trainData, testData = data[:n], data[n:]
     return trainData, testData
+
+
+
+def padding_fn(batch: List[Tuple[torch.Tensor, torch.Tensor]], pad_value) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    A collate function to pad sequences within a batch to the same length.
+
+    This function is designed to be used with a `DataLoader`. It takes a list of
+    (sequence, label) tuples, pads the sequences to the length of the longest
+    sequence in the batch, and stacks the labels into a single tensor.
+
+    Args:
+        batch (List[Tuple[torch.Tensor, torch.Tensor]]): A list of tuples from the
+            Dataset, where each tuple contains a variable-length sequence tensor
+            and a corresponding label tensor.
+        pad_value int: The value that we want to use for padding
+
+    Returns:
+        Tuple[torch.Tensor, torch.Tensor]: A tuple containing:
+            - A tensor of padded sequences with shape (batch_size, max_seq_length).
+            - A tensor of stacked labels with shape (batch_size,).
+    """
+    chunks, labels = zip(*batch)
+    padded_chunks = pad_sequence(chunks, batch_first=True, padding_value=pad_value)
+    stacked_labels = torch.stack(labels)
+    return padded_chunks, stacked_labels

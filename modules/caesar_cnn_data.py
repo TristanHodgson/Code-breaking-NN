@@ -3,6 +3,40 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 from typing import List, Tuple
 
+from modules import caesar
+from modules.get_text import *
+
+
+
+def initialise(num_blocks: int,
+               words_per_block: int,
+               test_train_split_num: float = 0.8,
+               stream: Optional[bool] = True) -> Tuple[List, List]:
+    """
+    Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, converts each character to a number, splits into random test and train datasets
+
+    Args:
+        encryptionAlgorithm (function): A function that takes a plaintext string and returns a tuple containing the corresponding ciphertext (str) and the random encryption key (int)
+        num_blocks (int): The total number of chunks of text to fetch
+        words_per_block (int): The number of words in each chunk.
+        test_train_split_num (float, optional): The proportion of the data to allocate to the training set. Defaults to 0.8
+
+    Returns:
+        tuple:
+            - The training dataset: A list of [numeric ciphertext, key] pairs
+            - The testing dataset: A list of [numeric ciphertext, key] pairs
+    """
+    textChucks = fetch_chunks(num_blocks, words_per_block, stream)
+
+    data = []
+    for chunk in tqdm(textChucks):
+        chunk, key = caesar.encrypt(chunk)
+        data.append([chunk, key])
+
+    for i, (string, key) in enumerate(data):
+        data[i] = [string2_num_list(string), key]
+    return test_train_split(data, test_train_split_num)
+
 
 class CipherDataset(Dataset):
     """
@@ -18,17 +52,10 @@ class CipherDataset(Dataset):
         labels (List[int]): A list of integer labels corresponding to each chunk.
     """
     def __init__(self, chunks: List[List[int]], labels: List[int]) -> None:
-        """Initializes the CipherDataset."""
-        self.chunks: List[List[int]] = chunks
-        self.labels: List[int] = labels
+        self.chunks = chunks
+        self.labels = labels
 
     def __len__(self) -> int:
-        """
-        Returns the total number of samples in the dataset.
-
-        Returns:
-            int: The number of samples.
-        """
         return len(self.chunks)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -70,16 +97,13 @@ def pad_fn(batch: List[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor
             - A tensor of padded sequences with shape (batch_size, max_seq_length).
             - A tensor of stacked labels with shape (batch_size,).
     """
-    chunks, labels = zip(*batch)
-    padded_chunks = pad_sequence(chunks, batch_first=True, padding_value=27)
-    stacked_labels = torch.stack(labels)
-    return padded_chunks, stacked_labels
+    return padding_fn(batch, 27)
 
 def data2loader(
     trainData: List[Tuple[List[int], int]],
     testData: List[Tuple[List[int], int]],
     BATCH_SIZE: int = 64
-) -> Tuple[DataLoader, DataLoader]:
+    ) -> Tuple[DataLoader, DataLoader]:
     """
     Converts raw training and testing data into PyTorch DataLoaders.
 
@@ -98,10 +122,10 @@ def data2loader(
         Tuple[DataLoader, DataLoader]: A tuple containing the training DataLoader
                                        and the testing DataLoader.
     """
-    train_chunks: List[List[int]] = [datum[0] for datum in trainData]
-    train_labels: List[int] = [datum[1] for datum in trainData]
-    test_chunks: List[List[int]] = [datum[0] for datum in testData]
-    test_labels: List[int] = [datum[1] for datum in testData]
+    train_chunks = [datum[0] for datum in trainData]
+    train_labels = [datum[1] for datum in trainData]
+    test_chunks  = [datum[0] for datum in testData]
+    test_labels  = [datum[1] for datum in testData]
 
     train_dataset = CipherDataset(train_chunks, train_labels)
     test_dataset = CipherDataset(test_chunks, test_labels)
