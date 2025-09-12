@@ -74,6 +74,9 @@ def decrypt(text: str, key: int) -> str:
     return encrypt(text, key=-key)[0]
 
 
+def rand_encrypt(text:str) -> str:
+    return encrypt(text)[0]
+
 if __name__ == "__main__":
     key = 2
     enc = encrypt("Hello World", key)[0]

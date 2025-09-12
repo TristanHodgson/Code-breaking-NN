@@ -4,6 +4,9 @@ import re
 
 from random import shuffle
 
+import torch
+from torch.nn.utils.rnn import pad_sequence
+
 from modules.caesar import char_to_num
 
 from typing import List, Generator, Tuple, Optional
@@ -96,26 +99,15 @@ def test_train_split(data: List, split: float) -> Tuple[List, List]:
 
 
 
-def padding_fn(batch: List[Tuple[torch.Tensor, torch.Tensor]], pad_value) -> Tuple[torch.Tensor, torch.Tensor]:
-    """
-    A collate function to pad sequences within a batch to the same length.
-
-    This function is designed to be used with a `DataLoader`. It takes a list of
-    (sequence, label) tuples, pads the sequences to the length of the longest
-    sequence in the batch, and stacks the labels into a single tensor.
-
-    Args:
-        batch (List[Tuple[torch.Tensor, torch.Tensor]]): A list of tuples from the
-            Dataset, where each tuple contains a variable-length sequence tensor
-            and a corresponding label tensor.
-        pad_value int: The value that we want to use for padding
-
-    Returns:
-        Tuple[torch.Tensor, torch.Tensor]: A tuple containing:
-            - A tensor of padded sequences with shape (batch_size, max_seq_length).
-            - A tensor of stacked labels with shape (batch_size,).
-    """
+def padding_fn(
+    batch: List[Tuple[torch.Tensor, torch.Tensor]],
+    pad_value,
+    both=False
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
     chunks, labels = zip(*batch)
     padded_chunks = pad_sequence(chunks, batch_first=True, padding_value=pad_value)
-    stacked_labels = torch.stack(labels)
-    return padded_chunks, stacked_labels
+    if both:
+        labels = pad_sequence(labels, batch_first=True, padding_value=pad_value)
+    else:
+        labels = torch.stack(labels)
+    return padded_chunks, labels

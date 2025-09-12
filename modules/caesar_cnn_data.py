@@ -13,10 +13,9 @@ def initialise(num_blocks: int,
                test_train_split_num: float = 0.8,
                stream: Optional[bool] = True) -> Tuple[List, List]:
     """
-    Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, converts each character to a number, splits into random test and train datasets
+    Fetches a specified number of text chunks, encrypts each chunk using a caesar cipher, converts each character to a number, splits into random test and train datasets
 
     Args:
-        encryptionAlgorithm (function): A function that takes a plaintext string and returns a tuple containing the corresponding ciphertext (str) and the random encryption key (int)
         num_blocks (int): The total number of chunks of text to fetch
         words_per_block (int): The number of words in each chunk.
         test_train_split_num (float, optional): The proportion of the data to allocate to the training set. Defaults to 0.8
@@ -79,24 +78,6 @@ class CipherDataset(Dataset):
         return sequence, label
 
 def pad_fn(batch: List[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor, torch.Tensor]:
-    """
-    A collate function to pad sequences within a batch to the same length.
-
-    This function is designed to be used with a `DataLoader`. It takes a list of
-    (sequence, label) tuples, pads the sequences to the length of the longest
-    sequence in the batch, and stacks the labels into a single tensor. The padding
-    value is set to 27.
-
-    Args:
-        batch (List[Tuple[torch.Tensor, torch.Tensor]]): A list of tuples from the
-            Dataset, where each tuple contains a variable-length sequence tensor
-            and a corresponding label tensor.
-
-    Returns:
-        Tuple[torch.Tensor, torch.Tensor]: A tuple containing:
-            - A tensor of padded sequences with shape (batch_size, max_seq_length).
-            - A tensor of stacked labels with shape (batch_size,).
-    """
     return padding_fn(batch, 27)
 
 def data2loader(
