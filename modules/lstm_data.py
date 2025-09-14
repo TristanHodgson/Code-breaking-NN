@@ -10,7 +10,8 @@ def initialise(encryptionAlgorithm,
                num_blocks: int,
                words_per_block: int,
                test_train_split_num: float = 0.8,
-               stream: Optional[bool] = True) -> Tuple[List, List]:
+               stream: Optional[bool] = True,
+               fixed_length: Optional[int] = None) -> Tuple[List, List]:
     """
     Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, converts each character to a number, splits into random test and train datasets
 
@@ -36,8 +37,19 @@ def initialise(encryptionAlgorithm,
         string = [29] + string2_num_list(string) + [28]
         encString = [29] + string2_num_list(encString) + [28]
         data[i] = [string, encString]
+        if fixed_length:
+            normalise_length(string, fixed_length)
+            normalise_length(encString, fixed_length)
     return test_train_split(data, test_train_split_num)
 
+
+def normalise_length(string, length):
+    if len(string) < length:
+        string.extend([27] * (length - len(string)))
+    else:
+        string[:] = string[:length]
+    assert len(string) == length
+    return
 
 class Seq2SeqDataset(Dataset):
     def __init__(self, data_pairs: List[List[List[int]]]):
@@ -47,7 +59,7 @@ class Seq2SeqDataset(Dataset):
         return len(self.data_pairs)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        source_seq, target_seq = self.data_pairs[idx]
+        target_seq, source_seq = self.data_pairs[idx]
         source_tensor = torch.tensor(source_seq, dtype=torch.long)
         target_tensor = torch.tensor(target_seq, dtype=torch.long)
         return source_tensor, target_tensor
@@ -69,7 +81,7 @@ def data2loader(
     train_loader = DataLoader(
         train_dataset,
         batch_size=BATCH_SIZE,
-        shuffle=False,  # Not necessary to be true as we already shuffled the next to ensure a proper test/train split
+        shuffle=True,
         collate_fn=pad_fn
     )
     test_loader = DataLoader(
