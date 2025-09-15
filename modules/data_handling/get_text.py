@@ -7,7 +7,7 @@ from random import shuffle
 import torch
 from torch.nn.utils.rnn import pad_sequence
 
-from modules.caesar import char_to_num
+from modules.encryption.caesar import char_to_num
 
 from typing import List, Generator, Tuple, Optional
 from tqdm.autonotebook import tqdm

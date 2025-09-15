@@ -3,7 +3,7 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 from typing import List, Tuple
 
-from modules.get_text import *
+from modules.data_handling.get_text import *
 
 
 def initialise(encryptionAlgorithm,
