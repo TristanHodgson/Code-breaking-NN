@@ -59,6 +59,7 @@ propcache==0.3.2
 psutil==7.0.0
 ptyprocess==0.7.0
 pure_eval==0.2.3
+py-enigma==0.1
 pyarrow==21.0.0
 Pygments==2.19.2
 python-dateutil==2.9.0.post0
