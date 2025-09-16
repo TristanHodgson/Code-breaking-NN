@@ -1,6 +1,6 @@
 from typing import Tuple, List
 from random import shuffle
-from modules.encryption.caesar import char_to_num
+from modules.helper import char_to_num
 
 def encrypt(text: str, key: List[int]) -> Tuple[str, int]:
     """Encrypt a string using the substitution algorithm.
