@@ -14,6 +14,7 @@ def char_to_num(char: str) -> int:
     """
     assert len(char) == 1, "Error, length of string passed to char_to_num() should be 1"
     if char.isalpha():
+        char = char.lower()
         return ord(char) - ord("a")
     elif char == " ":
         return -1
