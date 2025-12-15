@@ -25,7 +25,7 @@ def error_stats(errors, acceptable=10):
     return mean, sd, maximum, acceptable_errors_prop
 
 
-def plot_errors(errors, clip=100, acceptable=10):
+def plot_errors(errors, clip=100, acceptable=10, caption="", file=""):
     mean, sd, maximum, acceptable_errors_prop = error_stats(errors, acceptable)
 
     errors = Counter(errors)
@@ -47,8 +47,11 @@ def plot_errors(errors, clip=100, acceptable=10):
     plt.bar(x, y)
     plt.xlabel("Number of errors per string")
     plt.ylabel("Frequency")
-    plt.title(f"Mean: {mean:.1f} | Sd: {sd:.1f} | Proportion with acceptable errors: {acceptable_errors_prop:.2%} | Max errors: {maximum}\nClipped at {clip}, Acceptable means < {acceptable} character errors per string")
+    plt.title(f"Mean: {mean:.1f} | Sd: {sd:.1f} | Proportion with acceptable errors: {acceptable_errors_prop:.2%} | Max errors: {maximum}\nClipped at {clip}, Acceptable means < {acceptable} character errors per string\n{caption}")
+    if file != "":
+        plt.savefig(file)
     plt.show()
+
 
 
 def loss(output, y, loss_fn):
