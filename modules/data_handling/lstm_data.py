@@ -11,7 +11,8 @@ def initialise(encryptionAlgorithm,
                words_per_block: int,
                test_train_split_num: float = 0.8,
                stream: Optional[bool] = True,
-               fixed_length: Optional[int] = None) -> Tuple[List, List]:
+               fixed_length: Optional[int] = None,
+               prefix: str = "") -> Tuple[List, List]:
     """
     Fetches a specified number of text chunks, encrypts each chunk using a provided encryption algorithm, converts each character to a number, splits into random test and train datasets
 
@@ -30,6 +31,7 @@ def initialise(encryptionAlgorithm,
 
     data = []
     for chunk in tqdm(textChucks):
+        chunk = prefix + chunk
         enc = encryptionAlgorithm(chunk)
         data.append([chunk, enc])
 
