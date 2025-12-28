@@ -51,7 +51,7 @@ def decrypt(text: str, key: int) -> str:
         >>> decrypt("khoor zruog!", 3)
         'hello world!'
     """
-    return encrypt(text, key=-key)[0]
+    return encrypt(text, key=-key)
 
 
 def rand_encrypt(text:str) -> str:

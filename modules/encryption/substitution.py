@@ -1,6 +1,8 @@
 from typing import Tuple, List
 from random import shuffle
 from modules.helper import char_to_num
+import string
+
 
 def encrypt(text: str, key: List[int]) -> Tuple[str, int]:
     """Encrypt a string using the substitution algorithm.
@@ -42,4 +44,7 @@ def rand_encrypt(text: str):
     """
     key = [i for i in range(26)]
     shuffle(key)
-    return encrypt(text, key)
+    str_key = ""
+    for i, letter in enumerate(key):
+        str_key += list(string.ascii_lowercase)[letter-1]
+    return encrypt(text, key), str_key

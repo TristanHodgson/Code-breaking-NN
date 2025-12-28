@@ -6,13 +6,13 @@ import random
 def rand_encrypt(text: str) -> str:
     rotors = ["I", "II", "III", "IV", "V"]
     rotors = random.sample(rotors, 3)
-    rotors = ' '.join(rotors)
+    rotors = " ".join(rotors)
 
     reflectors = ["B", "C"]
     reflectors = random.choice(reflectors)
 
     rings = random.sample([str(i+1) for i in range(26)], 3)
-    rings = ' '.join(rings)
+    rings = " ".join(rings)
 
     alphabet = list(string.ascii_uppercase)
     random.shuffle(alphabet)
@@ -30,15 +30,14 @@ def rand_encrypt(text: str) -> str:
         plugboard_settings=plug_pairs_str
     )
     machine.set_display(message_key)
-    return machine.process_text(text)
-
+    return machine.process_text(text), key_encode(rotors, reflectors, rings, plug_pairs_str, message_key)
 
 def encrypt(text: str,
-                  rotors: str = "I II III",
-                  reflector: str = "B",
-                  rings: str = "1 1 1",
-                  plugboard: str = "",
-                  message_key: str = "ABC",) -> str:
+            rotors: str = "I II III",
+            reflector: str = "B",
+            rings: str = "1 1 1",
+            plugboard: str = "",
+            message_key: str = "ABC") -> str:
     machine = EnigmaMachine.from_key_sheet(
         rotors=rotors,
         reflector=reflector,
@@ -48,3 +47,15 @@ def encrypt(text: str,
     machine.set_display(message_key)
     out = machine.process_text(text.upper())
     return out.lower()
+
+
+def key_encode(rotors: str = "I II III",
+            reflector: str = "B",
+            rings: str = "1 1 1",
+            plugboard: str = "",
+            message_key: str = "ABC"):
+    rings = rings.split(" ")
+    encoded_rings = ""
+    for ring in rings:
+        encoded_rings = list(string.ascii_lowercase)[int(ring)-1]
+    return rotors.lower() + reflector.lower() + encoded_rings.lower() + plugboard.lower() + message_key.lower()
