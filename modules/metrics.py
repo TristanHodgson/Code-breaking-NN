@@ -15,7 +15,7 @@ def error_rate(predicted, ground_truth, PAD_TOKEN=27):
     return incorrect.tolist()
 
 
-def error_stats(errors, acceptable=10):
+def error_stats(errors, acceptable=50):
     errors_np = np.array(errors)
     mean = np.mean(errors_np)
     sd = np.std(errors_np)

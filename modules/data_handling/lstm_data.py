@@ -35,7 +35,7 @@ def initialise(encryptionAlgorithm,
         chunk = prefix + chunk
         enc, key = encryptionAlgorithm(chunk)
         if append_key:
-            data.append([chunk, enc+key])
+            data.append([key+ chunk, key+ enc])
         else:
             data.append([chunk, enc])
 
