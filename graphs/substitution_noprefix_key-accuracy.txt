@@ -1,0 +1,15 @@
+Train Loss: 2.172 | Test Loss: 2.053 | Mean test errors: 926.9
+Train Loss: 1.796 | Test Loss: 1.597 | Mean test errors: 730.9
+Train Loss: 1.534 | Test Loss: 1.429 | Mean test errors: 660.4
+Train Loss: 1.383 | Test Loss: 1.289 | Mean test errors: 595.1
+Train Loss: 1.262 | Test Loss: 1.188 | Mean test errors: 545.7
+Train Loss: 1.157 | Test Loss: 1.084 | Mean test errors: 496.3
+Train Loss: 1.073 | Test Loss: 1.013 | Mean test errors: 461.3
+Train Loss: 1.014 | Test Loss: 0.970 | Mean test errors: 436.5
+Train Loss: 0.954 | Test Loss: 0.891 | Mean test errors: 401.9
+Train Loss: 0.896 | Test Loss: 0.847 | Mean test errors: 382.3
+Train Loss: 0.846 | Test Loss: 0.807 | Mean test errors: 364.0
+Train Loss: 0.809 | Test Loss: 0.783 | Mean test errors: 353.0
+Train Loss: 0.776 | Test Loss: 0.744 | Mean test errors: 338.2
+Train Loss: 0.752 | Test Loss: 0.722 | Mean test errors: 329.2
+Train Loss: 0.728 | Test Loss: 0.696 | Mean test errors: 317.3
