@@ -25,7 +25,7 @@ def error_stats(errors, acceptable=50):
     return mean, sd, maximum, acceptable_errors_prop
 
 
-def plot_errors(errors, clip=1000, acceptable=10, caption="", file=""):
+def plot_errors(errors, clip=1000, acceptable=100, caption="", file=""):
     mean, sd, maximum, acceptable_errors_prop = error_stats(errors, acceptable)
 
     errors = Counter(errors)
@@ -43,7 +43,7 @@ def plot_errors(errors, clip=1000, acceptable=10, caption="", file=""):
     x = sorted(plot_counts.keys())
     y = [plot_counts[key] for key in x]
 
-    plt.figure(figsize=(10, 6), dpi=150)
+    plt.figure(figsize=(12, 6), dpi=300)
     plt.bar(x, y)
     plt.xlabel("Number of errors per string")
     plt.ylabel("Frequency")
