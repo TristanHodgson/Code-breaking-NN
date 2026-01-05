@@ -32,9 +32,19 @@ We consider cases where
 \]
 This prefix contains every letter of the alphabet at least once. When encrypted with a substitution or Caesar cipher, the prefix reveals the entire substitution table to the network after it has already seen the key.
 
-The ciphers considered in this project are the Caesar cipher, the simple substitution cipher, and the Enigma machine.
+The ciphers considered in this project are the Caesar cipher, and the substitution cipher.
 
 We differ slightly from the approach of Greydanus in two main ways. First, we use longer text sequences of 300 words (compared to 14), providing more context at the cost of increased training time and fewer feasible epochs. Second, we introduce a known prefix, which we hypothesise will increase test accuracy by providing additional information about the encryption algorithm.
+
+\section{Baseline}
+
+Each string has a length of 300 words from the Project Guttenberg dataset. If we include the prefix this goes up to 309 however if the string is longer than 1500 characters we cut it off at or pad to this point to give us constant size tensors.
+
+If we assume that we randomly guess characters (ignoring special tokens) with a uniform distribution we get that we would expect $\frac{25}{26} \times 1500 \approx 1440$ errors. While this calculation is very rough (we could improve it by considering frequency of letters in the dataset) it serves as a useful baseline to see if out model is doing anything useful.
+
+I consider a string of text that has fewer than 100 errors to be decrypted since this roughly means an average of an error every third word. This is an arbitrary boundary but likely a useful one for seeing how well we are really doing.
+
+If we assume our random model we may treat each of the 1500 characters as a Bernoulli distribution with parameter $\frac{25}{26}$. We then sum up all of these Bernoulli distributions and if we get a number less than 100 then this corresponds to a decrypted string. This means that we want the probability that a Binomial with parameters $P(B(1500, \frac{25}{26})) \le 100\approx 3\times 10^{-1825}$. Multiplying by the number of test examples (20000) gives us our expected number of such fluke cases as $\approx 6\times 10^{-1821}$, in other words, its not happening.
 
 \section{Model Architecture}
 
